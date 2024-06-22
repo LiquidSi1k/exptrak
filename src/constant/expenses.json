@@ -1,0 +1,24 @@
+{
+  "expenses": [
+    {
+      "bank": "OCBC",
+      "amountOwed": 1500.0,
+      "date": "1/2/2014"
+    },
+    {
+      "bank": "Phone Bill",
+      "amountOwed": 2000.0,
+      "date": "2/7/2023"
+    },
+    {
+      "bank": "Maybank",
+      "amountOwed": 1000.0,
+      "date": "2/7/2023"
+    },
+    {
+      "bank": "Electric Bill",
+      "amountOwed": 1800.0,
+      "date": "8/5/2024"
+    }
+  ]
+}
