@@ -104,14 +104,14 @@ const App: React.FC = () => {
               <div className="flex gap-4">
                 <div className="flex-center flex-col h-24 w-30 p-2 gap-1">
                   <div className="flex gap-1">
-                    <Invoice03Icon className="rounded-full shadow-[0_3px_10px_rgb(0,0,0,0.2)] p-1" />
+                    <Invoice03Icon className="rounded-full shadow-[0_3px_10px_rgb(0,0,0,0.2)] p-1 bg-orange-200" />
                     <p className="">${totalExpenses}</p>
                   </div>
                   <p className="text-xs">Total Expenses</p>
                 </div>
                 <div className="flex-center flex-col h-24 w-30 p-2 gap-1">
                   <div className="flex gap-1">
-                    <DollarSend02Icon className="rounded-full shadow-[0_3px_10px_rgb(0,0,0,0.2)] p-1" />
+                    <DollarSend02Icon className="rounded-full shadow-[0_3px_10px_rgb(0,0,0,0.2)] p-1 bg-orange-200" />
                     <p>${value}</p>
                   </div>
                   <p className="text-xs">Added resources</p>
@@ -135,7 +135,7 @@ const App: React.FC = () => {
               <p className="py-10 text-xl font-semibold">Current Expenses</p>
               <Popover>
                 <PopoverTrigger>
-                  <Add02Icon className="mr-4 hover:scale-110 active:scale-100" />
+                  <Add02Icon className="mr-4 hover:scale-110 active:scale-100 bg-orange-200 rounded-full p-1" />
                 </PopoverTrigger>
                 <PopoverContent>
                   <AddExpenseForm
