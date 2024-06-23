@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { PieChart, Pie, ResponsiveContainer, Cell } from "recharts";
 
 interface PieChartMainProps {
   totalExpenses: number;
@@ -43,11 +43,10 @@ const PieChartMain: React.FC<PieChartMainProps> = ({ totalExpenses }) => {
           animationBegin={0}
           cornerRadius={10}
         >
-          {data.map((entry, index) => (
+          {data.map((_, index) => (
             <Cell key={`cell-${index}`} fill={colors[index]} />
           ))}
         </Pie>
-        <Tooltip />
       </PieChart>
     </ResponsiveContainer>
   );
