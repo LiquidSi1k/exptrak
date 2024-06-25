@@ -22,7 +22,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
         {transactions.map((transaction) => (
           <li
             key={transaction.id}
-            className={`p-2 border rounded ${
+            className={`p-2 shadow-[0_3px_10px_rgb(0,0,0,0.2)] rounded ${
               transaction.type === "addition" ? "bg-red-100" : "bg-green-100"
             }`}
           >

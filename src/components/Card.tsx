@@ -11,12 +11,15 @@ interface Props {
 }
 
 const Card: React.FC<Props> = ({ expenses }) => {
+  // Filter expenses with amountOwed > 0
+  const filteredExpenses = expenses.filter((expense) => expense.amountOwed > 0);
+
   return (
     <>
-      {expenses.map((expense) => (
+      {filteredExpenses.map((expense) => (
         <div
           key={expense.bank}
-          className="h-24 min-w-40 rounded-xl flex justify-center items-center shadow-[0_3px_10px_rgb(0,0,0,0.2)] bg-green-100"
+          className="h-24 min-w-40 rounded-xl flex justify-center items-center shadow-[0_3px_10px_rgb(0,0,0,0.2)] bg-[#FFCB6F]"
         >
           <div className="flex justify-center items-center gap-4">
             <Receipt />

@@ -3,7 +3,6 @@ import "./App.css";
 import Nav from "./components/Nav";
 import Card from "./components/Card";
 import ExpenseForm from "./components/ExpenseForm";
-// import expensesData from "./constant/expenses.json";
 import { Add02Icon, Invoice03Icon, DollarSend02Icon } from "hugeicons-react";
 import {
   Popover,
@@ -14,8 +13,9 @@ import TransactionHistory from "./components/TransHx";
 import AddExpenseForm from "./components/AddExpenseForm";
 import BarChartMain from "./components/BarChart";
 import PieChart from "./components/PieChart";
-import { Hexagon } from "lucide-react";
+import { Hexagon, RotateCcw } from "lucide-react";
 import { useLocalStorage } from "./constant/useLocalStorage";
+import DialogOnStart from "./components/Dialog";
 
 interface Expense {
   bank: string;
@@ -31,23 +31,35 @@ interface Transaction {
   date: Date;
 }
 
-// const initialExpenses: Expense[] = expensesData.expenses;
-
 const App: React.FC = () => {
   const [value, setValue] = useState<number>(0);
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  console.log({ expenses });
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  console.log({ transactions });
+  const [name, setName] = useState<string>(() => {
+    const storedName = localStorage.getItem("userName");
+    return storedName || "";
+  });
 
-  const { setItem, getItem, removeItem } = useLocalStorage("value");
+  const {
+    setItem: setExpensesItem,
+    getItem: getExpensesItem,
+    // removeItem: removeExpensesItem,
+  } = useLocalStorage("expenses");
+
+  const { setItem: setTransactionsItem, getItem: getTransactionsItem } =
+    useLocalStorage("transactions");
 
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amountOwed, 0);
 
   useEffect(() => {
-    const storedValue = getItem();
-    if (storedValue) {
-      setExpenses(storedValue);
+    const storedExpenses = getExpensesItem();
+    if (storedExpenses) {
+      setExpenses(storedExpenses);
+    }
+
+    const storedTransactions = getTransactionsItem();
+    if (storedTransactions) {
+      setTransactions(storedTransactions);
     }
   }, []);
 
@@ -59,24 +71,22 @@ const App: React.FC = () => {
     e.preventDefault();
     const index = parseInt(dropDown);
     const bank = expenses[index].bank;
+    const currentAmountOwed = expenses[index].amountOwed;
 
-    setExpenses((prevExpenses) =>
-      prevExpenses.map((exp, i) =>
-        i === index
-          ? { ...exp, amountOwed: exp.amountOwed - inputValueNum }
-          : exp
-      )
+    if (currentAmountOwed < inputValueNum) {
+      // Handle the case where the input value exceeds the current amount owed
+      console.error("Input value exceeds current amount owed.");
+      return;
+    }
+
+    const updatedExpenses = expenses.map((exp, i) =>
+      i === index ? { ...exp, amountOwed: exp.amountOwed - inputValueNum } : exp
     );
 
-    // Update local storage with updated expenses directly from prevExpenses
+    setExpenses(updatedExpenses);
+
     try {
-      setItem(
-        expenses.map((exp, i) =>
-          i === index
-            ? { ...exp, amountOwed: exp.amountOwed - inputValueNum }
-            : exp
-        )
-      );
+      setExpensesItem(updatedExpenses.filter((exp) => exp.amountOwed > 0));
     } catch (error) {
       console.error("Error updating local storage:", error);
     }
@@ -91,6 +101,12 @@ const App: React.FC = () => {
       date: new Date(),
     };
     setTransactions([...transactions, newTransaction]);
+
+    try {
+      setTransactionsItem([...transactions, newTransaction]);
+    } catch (error) {
+      console.error("Error updating local storage:", error);
+    }
   };
 
   const addExpense = (bank: string, amountOwed: number, date: string) => {
@@ -98,7 +114,7 @@ const App: React.FC = () => {
     setExpenses((prevExpenses) => [...prevExpenses, newExpense]);
 
     try {
-      setItem([...expenses, newExpense]);
+      setExpensesItem([...expenses, newExpense]);
     } catch (error) {
       console.error("Error updating local storage:", error);
     }
@@ -111,29 +127,51 @@ const App: React.FC = () => {
       date: new Date(),
     };
     setTransactions([...transactions, newTransaction]);
+
+    try {
+      setTransactionsItem([...transactions, newTransaction]);
+    } catch (error) {
+      console.error("Error updating local storage:", error);
+    }
   };
 
   const removeExpense = (bank: string) => {
     const updatedExpenses = expenses.filter((expense) => expense.bank !== bank);
-
     setExpenses(updatedExpenses);
+    try {
+      setExpensesItem(updatedExpenses);
+    } catch (error) {
+      console.error("Error updating local storage:", error);
+    }
+  };
 
-    removeItem();
+  const handleNameChange = (newName: string) => {
+    setName(newName);
+    localStorage.setItem("userName", newName);
+  };
+
+  const handleNameReset = () => {
+    setName("");
+    localStorage.removeItem("userName");
   };
 
   return (
     <>
       <Nav />
       <header className="px-4 lg:px-20 pt-10 text-3xl font-semibold">
-        <p className="flex items-center gap-2">
-          <Hexagon /> Welcome Name!
-        </p>
+        <div className="flex items-center gap-2 relative">
+          <Hexagon /> <span>Welcome</span> {name ? name : "Guest"}!{" "}
+          <RotateCcw
+            className="absolute top-0 right-0 cursor-pointer"
+            size={15}
+            onClick={handleNameReset}
+          />
+        </div>
       </header>
       <main className="px-5 lg:px-20 pt-10 flex w-full max-lg:flex-col">
         <section className="w-full lg:w-4/5 mr-2 relative">
           <div className="w-full h-[26rem] lg:flex rounded-xl shadow-[0_3px_10px_rgb(0,0,0,0.2)] pl-2 relative">
             <div className="w-full h-full">
-              {/* info */}
               <div className="flex gap-4">
                 <div className="flex-center flex-col h-24 w-30 p-2 gap-1">
                   <div className="flex gap-1">
@@ -150,7 +188,6 @@ const App: React.FC = () => {
                   <p className="text-xs">Added resources</p>
                 </div>
               </div>
-              {/* chart */}
               <div className="h-4/6">
                 <BarChartMain expenses={expenses} />
               </div>
@@ -182,28 +219,24 @@ const App: React.FC = () => {
                 <div className=" w-2 h-2 border-r-2 border-t-2 border-orange-200 rotate-45" />
               </div>
             </div>
-            <div
-              className="flex gap-4 w-full overflow-x-auto py-3 px-1"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
+            <div className="flex gap-4 w-full overflow-x-auto py-3 px-1">
               <Card expenses={expenses} />
             </div>
           </div>
         </section>
 
-        <section
-          className="lg:border-l w-full lg:w-1/5 h-[85vh] overflow-y-auto relative"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
+        <section className="lg:border-l w-full lg:w-1/5 h-[85vh] overflow-y-auto relative">
           <div className="sticky top-0 ml-1">
             <ExpenseForm handleSubmit={handleSubmit} expenses={expenses} />
           </div>
 
-          <div className="">
+          <div>
             <TransactionHistory transactions={transactions} />
           </div>
         </section>
       </main>
+
+      {name ? null : <DialogOnStart onNameSubmit={handleNameChange} />}
     </>
   );
 };
